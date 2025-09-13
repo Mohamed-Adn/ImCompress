@@ -1,5 +1,7 @@
-import { Compressor } from '@/components/compressor';
-import { Image as ImageIcon } from 'lucide-react';
+import { SingleCompressor } from '@/components/single-compressor';
+import { BulkCompressor } from '@/components/bulk-compressor';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Image as ImageIcon, Layers } from 'lucide-react';
 
 function Header() {
   return (
@@ -17,7 +19,26 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <Compressor />
+         <Tabs defaultValue="single" className="w-full">
+            <div className="container mx-auto px-4 pt-4">
+              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+                <TabsTrigger value="single">
+                  <ImageIcon className="mr-2" />
+                  Single Image
+                </TabsTrigger>
+                <TabsTrigger value="bulk">
+                  <Layers className="mr-2" />
+                  Bulk Images
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value="single">
+              <SingleCompressor />
+            </TabsContent>
+            <TabsContent value="bulk">
+              <BulkCompressor />
+            </TabsContent>
+          </Tabs>
       </main>
     </div>
   );
