@@ -20,7 +20,7 @@ type Settings = {
   format: 'jpeg' | 'png' | 'webp';
 };
 
-export function Compressor() {
+export function SingleCompressor() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -152,7 +152,7 @@ export function Compressor() {
   };
 
   const renderDropzone = () => (
-    <div className="flex items-center justify-center w-full h-[calc(100vh-200px)]" {...commonDragEvents}>
+    <div className="flex items-center justify-center w-full h-[calc(100vh-280px)]" {...commonDragEvents}>
       <Card
         className={cn(
           "w-full max-w-2xl text-center p-10 lg:p-16 border-2 border-dashed hover:border-primary transition-colors duration-300 cursor-pointer",
