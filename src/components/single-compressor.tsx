@@ -17,7 +17,7 @@ type Settings = {
   width: number;
   height: number;
   quality: number;
-  format: 'jpeg' | 'png' | 'webp';
+  format: 'jpeg' | 'png' | 'webp' | 'jpg';
 };
 
 export function SingleCompressor() {
@@ -77,8 +77,9 @@ export function SingleCompressor() {
       canvas.height = settings.height;
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, settings.width, settings.height);
-
-      const mimeType = `image/${settings.format}`;
+      
+      const formatToUse = settings.format === 'jpg' ? 'jpeg' : settings.format;
+      const mimeType = `image/${formatToUse}`;
       const quality = settings.format === 'png' ? undefined : settings.quality / 100;
       const resultDataUrl = canvas.toDataURL(mimeType, quality);
 
@@ -114,7 +115,7 @@ export function SingleCompressor() {
         width: suggestions.width,
         height: suggestions.height,
         quality: suggestions.quality,
-        format: suggestions.format.toLowerCase() as 'jpeg' | 'png' | 'webp',
+        format: suggestions.format.toLowerCase() as 'jpeg' | 'png' | 'webp' | 'jpg',
       });
       toast({ title: "AI Suggestions Applied!", description: "The optimal settings have been loaded." });
     } catch (error) {
@@ -130,7 +131,8 @@ export function SingleCompressor() {
     const link = document.createElement('a');
     link.href = processedDataUrl;
     const name = originalFile.name.substring(0, originalFile.name.lastIndexOf('.'));
-    link.download = `${name}_compressed.${settings.format}`;
+    const formatToUse = settings.format === 'jpeg' ? 'jpg' : settings.format;
+    link.download = `${name}_compressed.${formatToUse}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -173,7 +175,7 @@ export function SingleCompressor() {
             ref={fileInputRef}
             type="file"
             className="hidden"
-            accept="image/png, image/jpeg, image/webp"
+            accept="image/png, image/jpeg, image/jpg, image/webp"
             onChange={(e) => handleFileChange(e.target.files ? e.target.files[0] : null)}
           />
         </CardContent>
@@ -226,10 +228,11 @@ export function SingleCompressor() {
         </div>
         <div className="space-y-2">
             <Label>Format</Label>
-            <Select value={settings.format} onValueChange={(v: 'jpeg' | 'png' | 'webp') => setSettings(s => ({ ...s, format: v }))}>
+            <Select value={settings.format} onValueChange={(v: 'jpeg' | 'png' | 'webp' | 'jpg') => setSettings(s => ({ ...s, format: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                     <SelectItem value="jpeg">JPEG</SelectItem>
+                    <SelectItem value="jpg">JPG</SelectItem>
                     <SelectItem value="png">PNG</SelectItem>
                     <SelectItem value="webp">WebP</SelectItem>
                 </SelectContent>

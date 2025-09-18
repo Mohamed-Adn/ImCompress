@@ -23,7 +23,7 @@ type ImageFile = {
     width: number;
     height: number;
     quality: number;
-    format: 'jpeg' | 'png' | 'webp';
+    format: 'jpeg' | 'png' | 'webp' | 'jpg';
   };
   processedDataUrl: string | null;
   processedSize: number | null;
@@ -36,13 +36,13 @@ export function BulkCompressor() {
   const [images, setImages] = useState<ImageFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [globalSettings, setGlobalSettings] = useState({ quality: 80, format: 'jpeg' as 'jpeg' | 'png' | 'webp' });
+  const [globalSettings, setGlobalSettings] = useState({ quality: 80, format: 'jpeg' as 'jpeg' | 'png' | 'webp' | 'jpg' });
 
   const handleFilesChange = (files: FileList | null) => {
     if (!files) return;
 
     const newImages: ImageFile[] = [];
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
 
     for (const file of Array.from(files)) {
       if (!allowedTypes.includes(file.type)) {
@@ -99,7 +99,8 @@ export function BulkCompressor() {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, settings.width, settings.height);
 
-      const mimeType = `image/${settings.format}`;
+      const formatToUse = settings.format === 'jpg' ? 'jpeg' : settings.format;
+      const mimeType = `image/${formatToUse}`;
       const quality = settings.format === 'png' ? undefined : settings.quality / 100;
       const resultDataUrl = canvas.toDataURL(mimeType, quality);
       const sizeInBytes = atob(resultDataUrl.split(',')[1]).length;
@@ -176,7 +177,8 @@ export function BulkCompressor() {
     images.forEach(image => {
       if (image.processedDataUrl) {
         const name = image.file.name.substring(0, image.file.name.lastIndexOf('.'));
-        const filename = `${name}_compressed.${image.settings.format}`;
+        const formatToUse = image.settings.format === 'jpeg' ? 'jpg' : image.settings.format;
+        const filename = `${name}_compressed.${formatToUse}`;
         const imgData = image.processedDataUrl.split(',')[1];
         zip.file(filename, imgData, { base64: true });
       }
@@ -236,7 +238,7 @@ export function BulkCompressor() {
             type="file"
             multiple
             className="hidden"
-            accept="image/png, image/jpeg, image/webp"
+            accept="image/png, image/jpeg, image/jpg, image/webp"
             onChange={(e) => handleFilesChange(e.target.files)}
           />
         </CardContent>
@@ -253,10 +255,11 @@ export function BulkCompressor() {
       <CardContent className="space-y-4">
         <div className="space-y-2">
             <Label>Format</Label>
-            <Select value={globalSettings.format} onValueChange={(v: 'jpeg' | 'png' | 'webp') => setGlobalSettings(s => ({ ...s, format: v }))}>
+            <Select value={globalSettings.format} onValueChange={(v: 'jpeg' | 'png' | 'webp' | 'jpg') => setGlobalSettings(s => ({ ...s, format: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                     <SelectItem value="jpeg">JPEG</SelectItem>
+                    <SelectItem value="jpg">JPG</SelectItem>
                     <SelectItem value="png">PNG</SelectItem>
                     <SelectItem value="webp">WebP</SelectItem>
                 </SelectContent>
@@ -311,10 +314,11 @@ export function BulkCompressor() {
                 <Input type="number" placeholder="Height" value={image.settings.height} onChange={e => handleImageUpdate(image.id, { settings: { height: parseInt(e.target.value) || 0 } })}/>
             </div>
              <div className="space-y-2">
-                <Select value={image.settings.format} onValueChange={(v: 'jpeg' | 'png' | 'webp') => handleImageUpdate(image.id, { settings: { format: v }})}>
+                <Select value={image.settings.format} onValueChange={(v: 'jpeg' | 'png' | 'webp' | 'jpg') => handleImageUpdate(image.id, { settings: { format: v }})}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="jpeg">JPEG</SelectItem>
+                        <SelectItem value="jpg">JPG</SelectItem>
                         <SelectItem value="png">PNG</SelectItem>
                         <SelectItem value="webp">WebP</SelectItem>
                     </SelectContent>
